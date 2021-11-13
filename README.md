@@ -19,7 +19,7 @@ After that, create a new folder by
 
 # Our Work
 
-Our code are mostly lie in the `directory /src/CTRL_py/scripts/`, but we also slightly modified the ur3 urdf file in `src/drivers/universal_robot/ur_description/urdf/ur3.urdf.xacro`, to install the sensors and effectors we need.
+Our code are mostly in the `directory /src/CTRL_py/scripts/`, but we also slightly modified the ur3 urdf file in `src/drivers/universal_robot/ur_description/urdf/ur3.urdf.xacro`, to install the sensors and effectors we need.
 
 # TODO List
 
