@@ -13,12 +13,13 @@ from math import pi
 from Ur3Interface import *
 from Ur3Scheduler import *
 from LaserInterface import *
+from math import *
 
 ur3IF = UR3Interface()
 ur3SKD = UR3Scheduler(ur3IF)
 laserIF = LaserInterface()
 # Position for UR3 not blocking the camera
-go_away = [270*math.pi/180.0, -90*math.pi/180.0, 90*math.pi/180.0, -90*math.pi/180.0, -90*math.pi/180.0, 135*math.pi/180.0]
+go_away = [270*math.pi/180.0, -90*math.pi/180.0, 90*math.pi/180.0, -90*math.pi/180.0, -90*math.pi/180.0, 225*math.pi/180.0]
 
 # Store world coordinates of sanitizer and the target place
 xw_yw_S = [0.3,0.15,0.15,0]
@@ -45,11 +46,7 @@ current_position_set = False
 
 image_shape_define = False
 
-"""
-Move robot arm from one position to another
-"""
-
-def move_block(start_pose, discrete_route_set, end_pose, vel, accel):
+def move_trace(start_pose, discrete_route_set, end_pose, vel, accel):
 
     ur3SKD.move_along_discrete_trace([[start_pose[0], start_pose[1], start_pose[2] + 0.05, start_pose[3]], start_pose], vel, accel)
     ur3IF.set_gripper(suction_on)
@@ -65,16 +62,23 @@ def move_block(start_pose, discrete_route_set, end_pose, vel, accel):
         time.sleep(2.0)
     ur3SKD.move_along_discrete_trace([[end_pose[0], end_pose[1], end_pose[2] + 0.05, end_pose[3]], end_pose], vel, accel)
     ur3IF.set_gripper(suction_off)
-    #Define locations from left to right as 1, 2, 3. Define height from low to high as 1 2 3
     time.sleep(1.0)
 
     error = 0
 
-    # ========================= Student's code ends here ===========================
-
     return error
 
-
+def detect_object():
+    angle = 180-laserIF.angle
+    distance = laserIF.distance
+    curr_pos = ur3IF.get_current_pose()
+    print (curr_pos)
+    print (distance)
+    print (angle)
+    distance -= 0.05
+    vect = np.array([[cos(angle/180*pi)*distance-0.0535], [sin(angle/180*pi)*distance], [0], [1]])
+    targetPose = np.matmul(curr_pos, vect)
+    return targetPose
 """
 Program run from here
 """
@@ -107,7 +111,10 @@ def main():
     Initial and final postion should be xw_yw_S, medimum place should be xw_yw_M which should be detected by the camera.
     """
 
-    move_block(xw_yw_S, [xw_yw_M,xw_yw_S,xw_yw_M,xw_yw_S,xw_yw_M,xw_yw_S,xw_yw_M,xw_yw_S], xw_yw_S, 4.0, 4.0)
+    # move_trace(xw_yw_S, [xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S], xw_yw_S, 4.0, 4.0)
+    targetposition = detect_object()
+    targetposition[3]=90
+    move_trace(targetposition,[targetposition],targetposition, 4.0, 4.0)
     ur3IF.set_angle(go_away, vel, accel)
     rospy.loginfo("Task Completed!")
     print("Use Ctrl+C to exit program")

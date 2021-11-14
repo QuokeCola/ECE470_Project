@@ -40,11 +40,12 @@ class UR3Interface:
 
         M, S = self.__Get_MS()
         theta = self._angle_feedback
+        theta[0] -= math.pi
+        theta[3] += (0.5*math.pi)
         T = np.identity(4)
         for i in range(6):
             T = np.matmul(T, expm(self.__skew(S[i]) * theta[i]))
         self._pose = np.matmul(T, M)
-        print (self._pose)
 
     def __gripper_callback(self, msg):
         """Callback function for gripper's feedback
