@@ -18,7 +18,9 @@ class UR3Interface:
         """
         self._angle_feedback = [0, 0, 0, 0, 0, 0]
         self._gripper_feedback = False
+        self._gripper_feedback = False
         self._target_reached = True
+        self._pose = []
 
         self._target_angle = [0, 0, 0, 0, 0, 0]
         self._target_sprayer_state = False
@@ -35,6 +37,14 @@ class UR3Interface:
         """
         for i in range(0, 6):
             self._angle_feedback[i] = msg.position[i]
+
+        M, S = self.__Get_MS()
+        theta = self._angle_feedback
+        T = np.identity(4)
+        for i in range(6):
+            T = np.matmul(T, expm(self.__skew(S[i]) * theta[i]))
+        self._pose = np.matmul(T, M)
+        print (self._pose)
 
     def __gripper_callback(self, msg):
         """Callback function for gripper's feedback
@@ -90,3 +100,23 @@ class UR3Interface:
         ur3_msg.a = self._target_acceleration
         ur3_msg.io_0 = self._target_sprayer_state
         self._cmd.publish(ur3_msg)
+
+    def __Get_MS(self):
+        M = np.array([[0,-1,0,(540.0-150.0)/1000],[0,0,-1,(150.0+120.0-93.0+83.0+82.0+59.0)/1000],[1,0,0,(10+152+53.5)/1000],[0,0,0,1]])
+        S1 = [0,0,1,0.15,0.15,0]
+        S2 = [0,1,0,-0.162,0,-0.15]
+        S3 = [0,1,0,-0.162,0,0.094]
+        S4 = [0,1,0,-0.162,0,0.3070]
+        S5 = [1,0,0,0,0.1620,-0.2600]
+        S6 = [0,1,0,-0.1620,0,0.3900]
+        S = [S1,S2,S3,S4,S5,S6]
+        return M, S
+
+    def __skew(self, vector):
+        return np.array([[0,            -vector[2],     vector[1],      vector[3]],
+                         [vector[2],    0,              -vector[0],     vector[4]],
+                         [-vector[1],   vector[0],      0,              vector[5]],
+                         [0,            0,              0,              0]])
+
+    def get_current_pose(self):
+        return self._pose

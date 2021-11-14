@@ -15,7 +15,7 @@ from Ur3Scheduler import *
 from LaserInterface import *
 
 ur3IF = UR3Interface()
-ur3SKD = UR3Scheduler()
+ur3SKD = UR3Scheduler(ur3IF)
 laserIF = LaserInterface()
 # Position for UR3 not blocking the camera
 go_away = [270*math.pi/180.0, -90*math.pi/180.0, 90*math.pi/180.0, -90*math.pi/180.0, -90*math.pi/180.0, 135*math.pi/180.0]
@@ -51,10 +51,9 @@ Move robot arm from one position to another
 
 def move_block(start_pose, discrete_route_set, end_pose, vel, accel):
 
-    angles = ur3SKD.convert_trace_to_angle([[start_pose[0], start_pose[1], start_pose[2] + 0.05, start_pose[3]], start_pose], vel, accel)
+    ur3SKD.move_along_discrete_trace([[start_pose[0], start_pose[1], start_pose[2] + 0.05, start_pose[3]], start_pose], vel, accel)
     ur3IF.set_gripper(suction_on)
-    for i in angles:
-        ur3IF.set_angle(i, vel, accel)
+
     time.sleep(1.0)
     if (ur3IF.get_gripper_sensor() == False):
         ur3IF.set_gripper(suction_off)
@@ -62,13 +61,9 @@ def move_block(start_pose, discrete_route_set, end_pose, vel, accel):
         rospy.loginfo("Block Missing, Mission Skipped!")
         return 1
     else:
-        angles = ur3SKD.convert_trace_to_angle(discrete_route_set, vel, accel)
-        for i in angles:
-            ur3IF.set_angle(i, vel, accel)
+        ur3SKD.move_along_discrete_trace(discrete_route_set, vel, accel)
         time.sleep(2.0)
-    angles = ur3SKD.convert_trace_to_angle([[end_pose[0], end_pose[1], end_pose[2] + 0.05, end_pose[3]], end_pose], vel, accel)
-    for i in angles:
-        ur3IF.set_angle(i, vel, accel)
+    ur3SKD.move_along_discrete_trace([[end_pose[0], end_pose[1], end_pose[2] + 0.05, end_pose[3]], end_pose], vel, accel)
     ur3IF.set_gripper(suction_off)
     #Define locations from left to right as 1, 2, 3. Define height from low to high as 1 2 3
     time.sleep(1.0)
@@ -108,7 +103,6 @@ def main():
     print ("Initial angle reached")
     time.sleep(5)
 
-    
     """
     Initial and final postion should be xw_yw_S, medimum place should be xw_yw_M which should be detected by the camera.
     """

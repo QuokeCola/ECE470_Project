@@ -1,13 +1,17 @@
 from Ur3Interface import *
 
 class UR3Scheduler():
-    def convert_trace_to_angle(self, trace, vel, accel):
+    def __init__(self, ur3IF_):
+        self.ur3IF = ur3IF_
+
+    def move_along_discrete_trace(self, trace, vel, accel):
         converted_thetas = []
         print ("Perform Inverse Kinematics Calculation")
         print ("\n")
         for i in trace:
             converted_thetas.append(self.__inv_kinetics(*i))
-        return converted_thetas
+        for i in converted_thetas:
+            self.ur3IF.set_angle(i, vel, accel)
 
     def __inv_kinetics(self, xWgrip, yWgrip, zWgrip, yaw_WgripDegree):
         """Calculate the joint angles for given position.
