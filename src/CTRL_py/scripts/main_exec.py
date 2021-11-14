@@ -78,6 +78,7 @@ def detect_object():
     distance -= 0.05
     vect = np.array([[cos(angle/180*pi)*distance-0.0535], [sin(angle/180*pi)*distance], [0], [1]])
     targetPose = np.matmul(curr_pos, vect)
+    print (targetPose)
     return targetPose
 """
 Program run from here
