@@ -19,13 +19,39 @@ After that, create a new folder by
 
 # Our Work
 
-Our code are mostly in the `directory /src/CTRL_py/scripts/`, but we also slightly modified the ur3 urdf file in `src/drivers/universal_robot/ur_description/urdf/ur3.urdf.xacro`, to install the sensors and effectors we need.
+Our code are mostly in the `directory /src/CTRL_py/scripts/`, but we also slightly modified the ur3 urdf file in 
+`src/drivers/universal_robot/ur_description/urdf/ur3.urdf.xacro`, to install the sensors and effectors we need.
+
+# Route generation
+
+It could be a little tricky to convert the scanned data from Lidar to robot's route. First the scanned data of angle 
+and distance were converted into world frame coordinates. Two edge point were also added to prevent the concave condition.
+Then, with OpenCV's ```fillPoly``` method, a solid shape were created.
+
+<img src=url("original_data.png")>
+
+It could be found that there has some noise in Lidar's data. To cancel the noise, gaussian blur filter were used.
+
+<img src=url("blurred_data.png")>
+
+After that, similar to Lab 5 and 6, with function ```inRange```, threshold were applied on the picture. The edge could be
+easily find.
+
+<img src=url("filtered_data.png")>
+
+The gaussian blur not only helped us extended the shape, but also provide a way to find the direction of YAW. As our sprayer
+should always face to the object to be disinfected, normally, we need to fit the function of route and calculate the curvature,
+which could be very complicated. Instead, with blurred image, direction could be easily obtained by taking the gradient.
+Then our route for arbitrary objects could be generated.
+
+<img src=url("generated_trace.png")>
+
 
 # TODO List
 
 - [x] Configure the environment
 - [x] Install sensor
 - [x] Drive motors on UR3
-- [ ] Kinematics
+- [x] Kinematics
 - [ ] End Effector
 - [ ] Logic Algorithm
