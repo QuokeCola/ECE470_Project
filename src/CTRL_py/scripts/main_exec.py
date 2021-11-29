@@ -13,11 +13,12 @@ from math import pi
 from Ur3Interface import *
 from Ur3Scheduler import *
 from LaserInterface import *
+import matplotlib.pyplot as plt
 from math import *
 
 ur3IF = UR3Interface()
 ur3SKD = UR3Scheduler(ur3IF)
-laserIF = LaserInterface()
+laserIF = LaserInterface(ur3IF)
 # Position for UR3 not blocking the camera
 go_away = [270*math.pi/180.0, -90*math.pi/180.0, 90*math.pi/180.0, -90*math.pi/180.0, -90*math.pi/180.0, 225*math.pi/180.0]
 
@@ -68,18 +69,6 @@ def move_trace(start_pose, discrete_route_set, end_pose, vel, accel):
 
     return error
 
-def detect_object():
-    angle = 180-laserIF.angle
-    distance = laserIF.distance
-    curr_pos = ur3IF.get_current_pose()
-    print (curr_pos)
-    print (distance)
-    print (angle)
-    distance -= 0.05
-    vect = np.array([[cos(angle/180*pi)*distance-0.0535], [sin(angle/180*pi)*distance], [0], [1]])
-    targetPose = np.matmul(curr_pos, vect)
-    print (targetPose)
-    return targetPose
 """
 Program run from here
 """
@@ -107,16 +96,28 @@ def main():
     ur3IF.set_angle(go_away, vel, accel)
     print ("Initial angle reached")
     time.sleep(5)
+    rospy.loginfo(len(laserIF.angle))
+    paths = laserIF.get_extended_path()
+    plt.plot(paths[0],paths[1])
+    plt.show()
+    # points_xlist = []
+    # points_ylist = []
+    # for i in laserIF.get_shape_data():
+    #     points_xlist.append(i[0])
+    #     points_ylist.append(i[1])
+    # plt.plot(points_xlist, points_ylist)
+    # plt.show()
+
 
     """
     Initial and final postion should be xw_yw_S, medimum place should be xw_yw_M which should be detected by the camera.
     """
 
     # move_trace(xw_yw_S, [xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S], xw_yw_S, 4.0, 4.0)
-    targetposition = detect_object()
-    targetposition[3]=90
-    move_trace(targetposition,[targetposition],targetposition, 4.0, 4.0)
-    ur3IF.set_angle(go_away, vel, accel)
+    # targetposition = IR2S()
+    # targetposition[3]=90
+    # move_trace(targetposition,[targetposition],targetposition, 4.0, 4.0)
+    # ur3IF.set_angle(go_away, vel, accel)
     rospy.loginfo("Task Completed!")
     print("Use Ctrl+C to exit program")
     rospy.spin()

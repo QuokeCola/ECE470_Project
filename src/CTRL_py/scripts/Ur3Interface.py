@@ -54,8 +54,7 @@ class UR3Interface:
 
     def set_gripper(self, sprayer_state_):
         """Set gripper of UR3
-
-        :param sprayer_state_ (True/False) whether the gripper is on or off
+        @param sprayer_state_ (True/False) whether the gripper is on or off
         """
         self._target_sprayer_state = sprayer_state_
 
@@ -64,10 +63,9 @@ class UR3Interface:
 
     def set_angle(self, target_angle_, speed_, acceleration_):
         """Set gripper of UR3
-
-        :param target_angle_ target angle of 6 joints
-        :param speed_ moving speed of UR3
-        :param acceleration_ acceleration of UR3
+        @param target_angle_ target angle of 6 joints
+        @param speed_ moving speed of UR3
+        @param acceleration_ acceleration of UR3
         """
         for i in range(0, 6):
             self._target_angle[i] = target_angle_[i]
