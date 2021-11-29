@@ -69,6 +69,26 @@ def move_trace(start_pose, discrete_route_set, end_pose, vel, accel):
 
     return error
 
+def generate_trace():
+    raw = laserIF.get_raw_data()
+    paths = laserIF.get_extended_path()
+    plt.plot(raw[0],raw[1])
+    plt.plot(paths[1],paths[2])
+    plt.quiver(paths[1], paths[2], paths[3][0], paths[3][1])
+    plt.show()
+    descrete_trace = []
+    count = 0
+    for i in range(0,len(paths[1])):
+        count = count + 1
+        if paths[1][i] < 300 and count > 10 and 100<np.linalg.norm([paths[1][i], paths[2][i]])<350:
+            descrete_trace.append([paths[1][i]/1000.0, # x
+                                   paths[2][i]/1000.0, # y
+                                   paths[0],         # height
+                                   atan2(-paths[3][1][i], -paths[3][0][i])/pi*180.0]) # yaw
+            count = 0
+        descrete_trace.reverse()
+    return descrete_trace
+
 """
 Program run from here
 """
@@ -96,32 +116,13 @@ def main():
     ur3IF.set_angle(go_away, vel, accel)
     print ("Initial angle reached")
     time.sleep(5)
-    rospy.loginfo(len(laserIF.angle))
-    paths = laserIF.get_extended_path()
-    plt.plot(paths[0],paths[1])
-    plt.show()
-    # points_xlist = []
-    # points_ylist = []
-    # for i in laserIF.get_shape_data():
-    #     points_xlist.append(i[0])
-    #     points_ylist.append(i[1])
-    # plt.plot(points_xlist, points_ylist)
-    # plt.show()
+    param_in = raw_input("Press [Enter] when ready:")
+    trace = generate_trace()
+    ur3SKD.move_along_discrete_trace(trace, 4.0, 4.0)
 
-
-    """
-    Initial and final postion should be xw_yw_S, medimum place should be xw_yw_M which should be detected by the camera.
-    """
-
-    # move_trace(xw_yw_S, [xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S, xw_yw_M, xw_yw_S], xw_yw_S, 4.0, 4.0)
-    # targetposition = IR2S()
-    # targetposition[3]=90
-    # move_trace(targetposition,[targetposition],targetposition, 4.0, 4.0)
-    # ur3IF.set_angle(go_away, vel, accel)
     rospy.loginfo("Task Completed!")
     print("Use Ctrl+C to exit program")
     rospy.spin()
-
 
 if __name__ == '__main__':
 
