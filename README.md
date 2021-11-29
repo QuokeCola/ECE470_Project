@@ -39,9 +39,9 @@ easily find.
 
 <img src="filtered_data.png"/>
 
-The gaussian blur not only helped us extended the shape, but also provide a way to find the direction of YAW. As our sprayer
-should always face to the object to be disinfected, normally, we need to fit the function of route and calculate the curvature,
-which could be very complicated. Instead, with blurred image, direction could be easily obtained by taking the gradient.
+The gaussian blur not only helped us find the route position, but also provide a way to find the direction of YAW for each point. As our sprayer
+should always face to the object to be disinfected, YAW is normally derived by fitting the function of route and calculating the curvature,
+which could be very complicated. Instead, with blurred image, direction could be obtained by taking the gradient.
 Then our route for arbitrary objects could be generated.
 
 <img src="generated_trace.png"/>
