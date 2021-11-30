@@ -112,10 +112,17 @@ def main():
 
     vel = 4.0
     accel = 4.0
-    print ("Tend to go to initial angle")
+    print("Picking up Disinfectant Spray")
+    ur3IF.set_angle(ur3SKD.inv_kinetics(-0.2,-0.2,0.3,0), vel, accel)
+    ur3IF.set_gripper(suction_on)
+    ur3IF.set_angle(ur3SKD.inv_kinetics(-0.2,-0.2,0.19,0), vel, accel)    
+    time.sleep(1)
+    ur3IF.set_angle(ur3SKD.inv_kinetics(-0.2,-0.2,0.3,0), vel, accel)  
+
+    print ("Moving to initial position")
     ur3IF.set_angle(go_away, vel, accel)
-    print ("Initial angle reached")
-    time.sleep(5)
+    print ("Initial position reached")
+    time.sleep(1)
     param_in = raw_input("Press [Enter] when ready:")
     trace = generate_trace()
     ur3SKD.move_along_discrete_trace(trace, 4.0, 4.0)
