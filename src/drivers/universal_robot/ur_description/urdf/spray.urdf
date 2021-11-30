@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot name="spray">
+
+<link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.2" radius="0.05"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+
+   <collision>
+     <geometry>
+       <cylinder length="0.2" radius="0.05"/>
+     </geometry>
+   </collision>
+
+   <inertial>
+     <mass value="0.01"/>
+     <inertia ixx="0.000004" ixy="0.0" ixz="0.0" iyy="0.000004" iyz="0.0" izz="0.000002"/>
+   </inertial>
+
+ </link>
+
+<gazebo reference="base_link">
+  <mu1>100</mu1>
+  <mu2>100</mu2>
+  <kp>2147483647</kp>
+  <kd>1</kd>
+  <maxVel>0</maxVel>
+  <minDepth>0.001</minDepth>
+  <material>Gazebo/Green</material>
+</gazebo>
+
+</robot>
