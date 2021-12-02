@@ -53,5 +53,5 @@ Then our route for arbitrary objects could be generated.
 - [x] Install sensor
 - [x] Drive motors on UR3
 - [x] Kinematics
-- [ ] End Effector
-- [ ] Logic Algorithm
+- [x] End Effector
+- [x] Logic Algorithm
